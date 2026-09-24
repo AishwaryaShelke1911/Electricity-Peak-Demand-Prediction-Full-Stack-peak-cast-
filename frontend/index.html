@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PeakCast — Electricity Peak Demand Prediction</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="brand">⚡ PeakCast</div>
+    <div class="navlinks">
+      <a href="#calendar">Calendar</a>
+      <a href="#results">Results</a>
+      <a href="#architecture">Architecture</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Grid analytics · final year major project</div>
+      <h1>Predicting electricity peaks, day by day</h1>
+      <p class="lead">Pick any date between Oct 2012 and Nov 2017 and see what the AEP transmission zone's real load looked like — plus the peak-day prediction score from a published Random Forest classifier.</p>
+      <a class="cta" href="#calendar">Open the calendar</a>
+    </div>
+    <div class="statbox">
+      <div class="lbl">Dataset</div>
+      <div class="num" id="heroStat">1,887 days</div>
+      <div class="lbl">AEP zone · Oct 2012 – Nov 2017</div>
+      <div class="lbl small" id="apiStatus">connecting to backend…</div>
+    </div>
+  </div>
+</section>
+
+<section id="calendar">
+  <div class="wrap">
+    <div class="eyebrow">Real historical data · AEP transmission zone</div>
+    <h2>Pick a date to see what actually happened</h2>
+    <p>Each day is colored by the trained model's peak-day probability — deep amber for high risk, gold for moderate, quiet for normal. Click any day to see its prediction score and values.</p>
+
+    <div class="cal-card">
+      <div class="cal-nav">
+        <button id="prevMonth" class="navbtn">‹</button>
+        <span id="calLabel">—</span>
+        <button id="nextMonth" class="navbtn">›</button>
+      </div>
+      <div class="cal-dow">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legend">
+        <span><i class="dot high"></i> High risk</span>
+        <span><i class="dot mod"></i> Moderate</span>
+        <span><i class="dot norm"></i> Normal</span>
+      </div>
+    </div>
+
+    <div class="panel-frame" id="dayPanel">
+      <span class="tag">real inference · Flask API → peak_day_model.pkl</span>
+      <p class="small" id="dayHint">Select a date on the calendar above to load its analysis.</p>
+
+      <div id="dayContent" style="display:none;">
+        <div class="daytitle">
+          <h3 id="dayDate">—</h3>
+          <span class="badge" id="dayRiskBadge">—</span>
+        </div>
+
+        <div class="cards3">
+          <div class="card"><div class="n" id="dayProb">—</div><div class="t">Peak-day probability</div></div>
+          <div class="card"><div class="n" id="dayMaxLoad">—</div><div class="t">Daily max load (MW)</div></div>
+          <div class="card"><div class="n" id="dayTemp">—</div><div class="t">Max temperature</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div class="eyebrow">Published model evaluation</div>
+    <h2>Real results, from the research project</h2>
+    <p>Two Random Forest classifiers, trained and evaluated on the real AEP dataset (see <code>real_models/</code>) — reported as-published, not placeholders.</p>
+
+    <h3 class="subhead">Peak-day model (test set: n=378, 12 peak-day instances)</h3>
+    <div class="cards3" id="dayMetricsCards">
+      <div class="card"><div class="n">—</div><div class="t">Accuracy</div></div>
+      <div class="card"><div class="n">—</div><div class="t">ROC-AUC</div></div>
+      <div class="card"><div class="n">—</div><div class="t">F1 (peak class)</div></div>
+    </div>
+
+    <h3 class="subhead">Peak-hour model (test set: n=9,050)</h3>
+    <div class="cards3" id="hourMetricsCards">
+      <div class="card"><div class="n">—</div><div class="t">Accuracy</div></div>
+      <div class="card"><div class="n">—</div><div class="t">ROC-AUC</div></div>
+      <div class="card"><div class="n">—</div><div class="t">Max probability</div></div>
+    </div>
+
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <div class="eyebrow">System design</div>
+    <h2>How it's wired</h2>
+    <div class="arch">
+      <div class="stage"><h3>Data layer</h3><p>Real AEP hourly load + multi-city temperature/humidity (<code>real_data/</code>).</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><h3>Prediction engine</h3><p>Two published RandomForestClassifiers (<code>real_models/</code>) served by Flask.</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><h3>Dashboard</h3><p>This page — a calendar of real history with each day's prediction score and values.</p></div>
+    </div>
+    <p class="small" style="margin-top:18px;">Endpoints: <code>/api/history/day/&lt;date&gt;</code>, <code>/api/history/calendar/&lt;year&gt;/&lt;month&gt;</code>, <code>/api/history/metrics</code>. See <code>backend/history.py</code> and <code>backend/app.py</code>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand">⚡ PeakCast</div>
+    <p class="small">Peak Electricity Demand Prediction Using Dual-Granularity Random Forest Classification — a case study on the AEP transmission zone.</p>
+    <p class="small">Replace with your name, roll number and guide before submission.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
