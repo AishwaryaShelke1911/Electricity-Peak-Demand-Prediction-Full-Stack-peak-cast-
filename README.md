@@ -74,7 +74,6 @@ model's peak-day probability climbs to ~69% and load tops 22,800 MW around
 
 Served live at `GET /api/history/metrics` and `GET /api/history/feature-importance`.
 
-## What to say to the panel
 
 - **Problem**: grids are provisioned for their single worst hour of the
   year; advance warning on that peak lets an operator pre-cool buildings,
